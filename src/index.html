@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GIF Generator — Tailwind + Vanilla JS</title>
+  <title>Gif Jif Maker</title>
+  <link rel='icon' href='data:;base64,='>
   <script src='tailwindcss.min.js'></script>
   <!-- gif.js library + worker (used to encode animated GIFs in browser) -->
   <script src="gif.js"></script>
@@ -26,7 +27,7 @@
  
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen p-6 overflow-hidden">
+<body class="bg-gray-50 min-h-screen p-6 pt-2 overflow-hidden">
   <div class="w-full mx-auto">
 
 
@@ -34,7 +35,7 @@
             <button id="remove-all-btn" class="px-4 py-2 text-sm text-red-600 border hover:bg-red-600 hover:text-white rounded">Remove All</button>
 
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 -ml-[60px]">
               <button id="play-btn" class="px-3 py-2 text-green-600 border rounded hover:bg-green-700 hover:text-white">Play</button>
             <button id="stop-btn" class="px-3 py-2 border hover:bg-black hover:text-white rounded">Stop</button>
             <div class="text-sm text-gray-500">(or use spacebar)</div>

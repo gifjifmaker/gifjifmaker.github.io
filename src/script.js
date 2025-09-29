@@ -50,6 +50,20 @@ function removeFrame(id) {
   if (!frames.length) clearCanvas();
 }
 
+const removeAllBtn = document.getElementById('remove-all-btn');
+
+removeAllBtn.addEventListener('click', () => {
+  if (!frames.length) return;
+  const confirmed = confirm('Are you sure you want to remove all frames? This cannot be undone.');
+  if (!confirmed) return;
+
+  frames = [];
+  selectedItems.clear();
+  renderFramesList();
+  clearCanvas();
+});
+
+
 // --- Render frames list ---
 function renderFramesList() {
   framesList.innerHTML = '';
