@@ -15,6 +15,10 @@ const progressText = document.getElementById('progress-text');
 const fpsLabel = document.getElementById('fps-label');
 const scaleSelect = document.getElementById('scale');
 
+// --- New: Apply to all duration ---
+const applyAllInput = document.getElementById('apply-all-duration');
+const applyAllBtn = document.getElementById('apply-all-btn');
+
 // frames: { id, file, name, duration(ms), imgBitmap }
 let frames = [];
 let playing = false;
@@ -39,21 +43,12 @@ function escapeHtml(s) {
   return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 }
 
-
 function removeFrame(id) {
-  // remove from frames array
   frames = frames.filter(f => f.id !== id);
-
-  // remove from selectedItems set if present
   selectedItems.delete(id);
-
-  // re-render the list
   renderFramesList();
-
-  // clear canvas if no frames left
   if (!frames.length) clearCanvas();
 }
-
 
 // --- Render frames list ---
 function renderFramesList() {
@@ -78,7 +73,7 @@ function renderFramesList() {
     const meta = document.createElement('div');
     meta.className = 'flex-1';
     meta.innerHTML = `<div class="text-sm font-medium truncate">${escapeHtml(f.name)}</div>
-                      <div class="text-xs text-gray-500">${bytesToSize(f.file.size)}</div>`;
+    <div class="text-xs text-gray-500">${bytesToSize(f.file.size)}</div>`;
 
     // Controls
     const controls = document.createElement('div');
@@ -86,11 +81,11 @@ function renderFramesList() {
 
     const durationInput = document.createElement('input');
     durationInput.type = 'number';
-    durationInput.min = 50;
+    durationInput.min = 10;
     durationInput.value = f.duration;
     durationInput.title = 'Duration in ms';
     durationInput.className = 'w-20 text-sm border rounded px-2 py-1';
-    durationInput.addEventListener('change', () => f.duration = Math.max(50, parseInt(durationInput.value) || 100));
+    durationInput.addEventListener('change', () => f.duration = Math.max(10, parseInt(durationInput.value) || 100));
 
     const removeBtn = document.createElement('button');
     removeBtn.className = 'px-2 py-1 text-xs text-red-600';
@@ -98,10 +93,9 @@ function renderFramesList() {
     removeBtn.addEventListener('click', ev => { ev.stopPropagation(); removeFrame(f.id); });
 
     controls.append(durationInput, removeBtn);
-
     li.append(thumbnail, meta, controls);
     framesList.appendChild(li);
-    framesList.classList.add("mt-4");
+    framesList.classList.add("mt-3");
 
     // --- Events for selection & drag ---
     li.addEventListener('click', e => handleSelectClick(e, li, f.id));
@@ -114,7 +108,6 @@ function renderFramesList() {
 // --- Selection & Drag helpers ---
 function handleSelectClick(e, li, id) {
   if (e.shiftKey) {
-    // toggle
     if (selectedItems.has(id)) {
       selectedItems.delete(id);
       li.classList.remove('selected');
@@ -132,9 +125,8 @@ function handleSelectClick(e, li, id) {
 }
 
 function handleDragStart(e, li) {
-  if (e.shiftKey) return; // disable drag when shift held
+  if (e.shiftKey) return;
 
-  // select if not already
   const id = li.dataset.id;
   if (!selectedItems.has(id)) {
     selectedItems.forEach(sel => document.querySelector(`li[data-id="${sel}"]`)?.classList.remove('selected'));
@@ -150,7 +142,6 @@ function handleDragStart(e, li) {
   li.parentNode.insertBefore(placeholder, li);
 
   draggedItems.forEach(item => item.style.display = 'none');
-
   e.dataTransfer.effectAllowed = 'move';
 }
 
@@ -310,6 +301,13 @@ async function addFiles(fileList) {
   renderFramesList();
   if (frames.length) await drawFrameOnCanvas(frames[0]);
 }
+
+// --- Apply to all logic ---
+applyAllBtn.addEventListener('click', () => {
+  const val = Math.max(10, parseInt(applyAllInput.value) || 10);
+  frames.forEach(f => f.duration = val);
+  renderFramesList();
+});
 
 // --- Events ---
 dropzone.addEventListener('click', () => fileInput.click());
