@@ -6,13 +6,15 @@
   <title>GIF Generator — Tailwind + Vanilla JS</title>
   <script src='tailwindcss.min.js'></script>
   <!-- gif.js library + worker (used to encode animated GIFs in browser) -->
-  <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+  <script src="gif.js"></script>
 
   <style>
   .frame-item.selected {
     background-color: #FECACA;
     border: 1px solid yellow;
   }
+
+  /* invisible scrollbar for frames column */
   #frames-list::-webkit-scrollbar {
   display: none;
 }
@@ -28,13 +30,17 @@
   <div class="w-full mx-auto">
 
 
-          <div class="flex items-center gap-2 mb-2">
+          <div class="w-full flex justify-between items-center gap-2 mb-2">
+            <button id="remove-all-btn" class="px-4 py-2 text-sm text-red-600 border hover:bg-red-600 hover:text-white rounded">Remove All</button>
+
+
             <div class="flex items-center gap-2">
-              <button id="play-btn" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Play</button>
-            <button id="stop-btn" class="px-3 py-2 bg-gray-200 rounded">Stop</button>
+              <button id="play-btn" class="px-3 py-2 text-green-600 border rounded hover:bg-green-700 hover:text-white">Play</button>
+            <button id="stop-btn" class="px-3 py-2 border hover:bg-black hover:text-white rounded">Stop</button>
             <div class="text-sm text-gray-500">(or use spacebar)</div>
             </div>
-            <div class="ml-auto text-sm text-gray-600">Preview FPS: <span id="fps-label">auto</span></div>
+
+            <div class="text-sm text-gray-600">Preview FPS: <span id="fps-label">auto</span></div>
           </div>
           
     <div class="grid grid-cols-12 gap-6">
@@ -52,7 +58,7 @@
 
           <div class="flex gap-2 items-center my-0">
           <input id="apply-all-duration" type="number" min="50" class="border rounded px-2 py-1 w-24" placeholder="ms">
-          <button id="apply-all-btn" class="px-3 py-1 bg-amber-400 text-white rounded">Apply to all</button>
+          <button id="apply-all-btn" class="px-3 py-1 border text-blue-600 hover:bg-blue-700 hover:text-white rounded">Apply to all</button>
         </div>
           </div>
 
