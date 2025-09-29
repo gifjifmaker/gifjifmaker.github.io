@@ -7,8 +7,24 @@
   <script src='tailwindcss.min.js'></script>
   <!-- gif.js library + worker (used to encode animated GIFs in browser) -->
   <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+
+  <style>
+  .frame-item.selected {
+    background-color: #FECACA;
+    border: 1px solid yellow;
+  }
+  #frames-list::-webkit-scrollbar {
+  display: none;
+}
+
+#frames-list {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+ 
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen p-6">
+<body class="bg-gray-50 min-h-screen p-6 overflow-hidden">
   <div class="w-full mx-auto">
 
 
@@ -27,11 +43,14 @@
         
         <div class="mt-0 bg-white rounded py-4 px-3 border border-gray-100 shadow-sm">
           <div class="flex items-center justify-between mt-0">
-            <h2 class="font-medium">Frames</h2>
+              <h2 class="font-medium">Frames</h2>
+            <div class="flex gap-2 items-center">
             <div class="text-xs text-gray-500">Drag to reorder</div>
+            <div class="text-xs text-gray-500">(shift + click for multiple select)</div>
+            </div>
           </div>
 
-          <ul id="frames-list" class="space-y-2 max-h-[60vh] overflow-auto">
+          <ul id="frames-list" class="space-y-2 max-h-[90vh] overflow-auto">
             <!-- frames inserted here -->
           </ul>
 
@@ -41,7 +60,7 @@
       </div>
 
       <!-- Right: preview -->
-      <div class="col-span-7">
+      <div class="col-span-7 h-fit">
         <div class="bg-white rounded p-3 border border-gray-100 shadow-sm h-full flex flex-col">
           <div class="flex items-start justify-between mb-3">
             <div class="flex gap-1 items-center">
