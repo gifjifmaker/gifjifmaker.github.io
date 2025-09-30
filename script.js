@@ -95,11 +95,11 @@ function renderFramesList() {
 
     const durationInput = document.createElement('input');
     durationInput.type = 'number';
-    durationInput.min = 10;
+    durationInput.min = 1;
     durationInput.value = f.duration;
     durationInput.title = 'Duration in ms';
     durationInput.className = 'w-20 text-sm border rounded px-2 py-1';
-    durationInput.addEventListener('change', () => f.duration = Math.max(10, parseInt(durationInput.value) || 100));
+    durationInput.addEventListener('change', () => f.duration = Math.max(1, parseInt(durationInput.value) || 100));
 
     const removeBtn = document.createElement('button');
     removeBtn.className = 'px-2 py-1 text-xs text-red-600';
@@ -109,7 +109,7 @@ function renderFramesList() {
     controls.append(durationInput, removeBtn);
     li.append(thumbnail, meta, controls);
     framesList.appendChild(li);
-    framesList.classList.add("mt-3");
+    framesList.classList.add("mt-1.5", "pb-16");
 
     // --- Events for selection & drag ---
     li.addEventListener('click', e => handleSelectClick(e, li, f.id));
@@ -318,7 +318,7 @@ async function addFiles(fileList) {
 
 // --- Apply to all logic ---
 applyAllBtn.addEventListener('click', () => {
-  const val = Math.max(10, parseInt(applyAllInput.value) || 10);
+  const val = Math.max(1, parseInt(applyAllInput.value) || 1);
   frames.forEach(f => f.duration = val);
   renderFramesList();
 });
