@@ -1,7 +1,7 @@
-## Project Name
+## gifjifmaker
 
-[LIVE SITE]()
+[LIVE SITE](https://gifjifmaker.github.io.git)
 
-![ALT:preview](preview.png)
+<!-- ![ALT:preview](preview.png) -->
 
 
