@@ -2,6 +2,7 @@
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('file-input');
 const framesList = document.getElementById('frames-list');
+const removeAllBtn = document.getElementById('remove-all-btn');
 const playBtn = document.getElementById('play-btn');
 const stopBtn = document.getElementById('stop-btn');
 const exportBtn = document.getElementById('export-btn');
@@ -12,12 +13,21 @@ const bgColorInput = document.getElementById('bg-color');
 const progress = document.getElementById('progress');
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
-const fpsLabel = document.getElementById('fps-label');
 const scaleSelect = document.getElementById('scale');
 
-// --- New: Apply to all duration ---
 const applyAllInput = document.getElementById('apply-all-duration');
 const applyAllBtn = document.getElementById('apply-all-btn');
+
+const focusBtn = document.getElementById('focus-preview-btn');
+const bgColor = document.getElementById('bg-color');
+const durationInput = document.getElementById('apply-all-duration');
+const body = document.body;
+
+const toggleBtn = document.getElementById('toggleOrientationBtn');
+const info = document.getElementById('info');
+const previewContainer = document.getElementById('preview-container');
+const collapseBtn = document.getElementById('collapseBtn');
+
 
 // frames: { id, file, name, duration(ms), imgBitmap }
 let frames = [];
@@ -50,7 +60,7 @@ function removeFrame(id) {
   if (!frames.length) clearCanvas();
 }
 
-const removeAllBtn = document.getElementById('remove-all-btn');
+
 
 removeAllBtn.addEventListener('click', () => {
   if (!frames.length) return;
@@ -82,11 +92,18 @@ function renderFramesList() {
     img.alt = f.name;
     img.className = 'w-full h-full object-cover';
     thumbnail.appendChild(img);
-
+    
     // Meta
     const meta = document.createElement('div');
     meta.className = 'flex-1';
-    meta.innerHTML = `<div class="text-sm font-medium truncate">${escapeHtml(f.name)}</div>
+
+    // Only truncate if the element will have the 'truncate' class
+    let displayName = f.name;
+    if (displayName.length > 40) {
+      displayName = displayName.slice(0, 37) + '...';
+    }
+
+    meta.innerHTML = `<div class="text-sm font-medium truncate" title="${escapeHtml(f.name)}">${escapeHtml(displayName)}</div>
     <div class="text-xs text-gray-500">${bytesToSize(f.file.size)}</div>`;
 
     // Controls
@@ -201,10 +218,11 @@ function syncFramesFromDOM() {
 
 // --- Frame / Canvas ---
 async function drawFrameOnCanvas(frame) {
+  if (!frame) return;
+
   const w = Math.round(previewCanvas.width * parseFloat(scaleSelect.value));
   const h = Math.round(previewCanvas.height * parseFloat(scaleSelect.value));
   const imgBitmap = frame.imgBitmap || await createImageBitmap(frame.file);
-  frame.imgBitmap = imgBitmap;
 
   ctx.fillStyle = bgColorInput.value;
   ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
@@ -215,7 +233,13 @@ async function drawFrameOnCanvas(frame) {
   const dx = (previewCanvas.width - dw)/2;
   const dy = (previewCanvas.height - dh)/2;
   ctx.drawImage(imgBitmap, dx, dy, dw, dh);
-  frameInfo.textContent = `${frames.indexOf(frame)+1} / ${frames.length}: ${frame.name} — ${frame.duration} ms`;
+
+  let frameInfoName = frame.name;
+    if (frame.name.length > 20) {
+      frameInfoName = frame.name.slice(0, 17) + '...';
+    }
+
+  frameInfo.textContent = `${frames.indexOf(frame)+1} / ${frames.length} - ${frame.duration} ms : ${frameInfoName}`;
 }
 
 function clearCanvas() {
@@ -224,27 +248,43 @@ function clearCanvas() {
   frameInfo.textContent = 'No frames';
 }
 
-// --- Play / Stop ---
+
 async function play() {
   if (!frames.length) return;
   playing = true;
-  playBtn.disabled = true;
-  stopBtn.disabled = false;
-  playIndex = 0;
-  fpsLabel.textContent = 'variable';
 
+  // Toggle icons
+  playBtn.classList.add('hidden');
+  stopBtn.classList.remove('hidden');
+
+  playIndex = 0;
   while (playing) {
     const f = frames[playIndex];
     await drawFrameOnCanvas(f);
     await wait(f.duration);
     playIndex = (playIndex + 1) % frames.length;
   }
-  playBtn.disabled = false;
-  stopBtn.disabled = true;
+
+  // Reset icons when stopped
+  playBtn.classList.remove('hidden');
+  stopBtn.classList.add('hidden');
 }
 
-function stop() { playing = false; }
-function wait(ms) { return new Promise(res => setTimeout(res, ms)); }
+function stop() {
+  playing = false;
+  playBtn.classList.remove('hidden');
+  stopBtn.classList.add('hidden');
+}
+
+function wait(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+// --- Event listeners ---
+playBtn.addEventListener('click', play);
+stopBtn.addEventListener('click', stop);
+
+
 
 // --- GIF export ---
 async function exportGIF() {
@@ -338,7 +378,11 @@ stopBtn.addEventListener('click', () => stop());
 stopBtn.disabled = true;
 
 exportBtn.addEventListener('click', () => exportGIF());
-bgColorInput.addEventListener('change', () => { if(!playing) clearCanvas(); });
+
+bgColorInput.addEventListener('input', () => {  // was 'change'
+  if (!playing) clearCanvas();
+});
+
 
 // --- Keyboard ---
 document.addEventListener('keydown', e => {
@@ -348,6 +392,78 @@ document.addEventListener('keydown', e => {
   }
 });
 
+
+
+let isPortrait = true;
+let isCollapsed = false;
+
+function updateCollapseButton() {
+  // Update collapseBtn content depending on state
+  collapseBtn.innerHTML = isCollapsed
+    ? `
+      <button class="px-3 py-2">
+        <img title="Click to expand panel" src="collapse.webp" alt="expand icon" class="h-6 w-6 rotate-180">
+      </button>
+    `
+    : `
+      <button class="px-3 py-2">
+        <img title="Click to collapse panel" src="collapse.webp" alt="collapse icon" class="h-6 w-6">
+      </button>
+    `;
+}
+
+function toggleInfo() {
+  if (isPortrait) return; // only works in landscape mode
+
+  // Toggle visibility
+  info.classList.toggle('hidden');
+  previewContainer.classList.toggle('col-span-2');
+  previewContainer.classList.toggle('col-span-3');
+
+  // Update state + button icon
+  isCollapsed = !isCollapsed;
+  updateCollapseButton();
+}
+
+toggleBtn.addEventListener('click', () => {
+  const ctx = previewCanvas.getContext('2d');
+
+  if (isPortrait) {
+    // Switch to landscape
+    previewCanvas.width = 1100;
+    previewCanvas.height = 600;
+    toggleBtn.textContent = 'Switch to Portrait';
+
+    collapseBtn.classList.remove('hidden');
+    collapseBtn.classList.add('flex');
+    updateCollapseButton();
+  } else {
+    // Switch to portrait
+    previewCanvas.width = 600;
+    previewCanvas.height = 1100;
+    toggleBtn.textContent = 'Switch to Landscape';
+
+    // Ensure info panel is visible again when returning to portrait
+    info.classList.remove('hidden');
+    previewContainer.classList.remove('col-span-3');
+    previewContainer.classList.add('col-span-2');
+
+    collapseBtn.classList.remove('flex');
+    collapseBtn.classList.add('hidden');
+    isCollapsed = false;
+  }
+
+  // Optional: clear or refresh
+  ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+  isPortrait = !isPortrait;
+});
+
+// Delegate click event for collapse/expand button
+collapseBtn.addEventListener('click', toggleInfo);
+
+
+
 // --- Initialize ---
 function initCanvas() {
   previewCanvas.width = 600;
@@ -355,3 +471,66 @@ function initCanvas() {
   clearCanvas();
 }
 initCanvas();
+
+
+function toggleFocusMode(force = null) {
+  const isActive =
+    force === null
+      ? body.classList.toggle('focus-mode')
+      : (force
+          ? body.classList.add('focus-mode')
+          : body.classList.remove('focus-mode'),
+        force);
+
+  // Hide or show elements
+  bgColor.classList.toggle('hidden', isActive);
+  removeAllBtn.classList.toggle('hidden', isActive);
+
+  // Respect current play state
+  if (isActive) {
+    // In focus mode — hide both buttons
+    playBtn.classList.add('hidden');
+    stopBtn.classList.add('hidden');
+  } else {
+    // Leaving focus mode — show only the correct one
+    if (playing) {
+      playBtn.classList.add('hidden');
+      stopBtn.classList.remove('hidden');
+    } else {
+      playBtn.classList.remove('hidden');
+      stopBtn.classList.add('hidden');
+    }
+  }
+
+  // Hide all inputs except file selector
+  document.querySelectorAll('input').forEach(input => {
+    if (input.id === 'file-input') return;
+    input.classList.toggle('hidden', isActive);
+  });
+
+  // Remove border on the focus button when active
+  const focusBtn = document.getElementById('focus-preview-btn');
+  focusBtn.classList.toggle('border', !isActive);
+  focusBtn.classList.toggle('mt-[13px]', isActive);
+}
+
+
+// Focus button click
+focusBtn.addEventListener('click', () => toggleFocusMode());
+
+// Exit focus mode when clicking anywhere (except the canvas or button)
+document.addEventListener('click', e => {
+  if (!body.classList.contains('focus-mode')) return;
+
+  const canvas = document.getElementById('preview-canvas');
+  if (e.target === canvas || e.target === focusBtn) return;
+
+  toggleFocusMode(false);
+});
+
+// ESC key listener
+document.addEventListener('keydown', e => {
+  if (e.code === 'Escape') {
+    toggleFocusMode(false);
+  }
+});

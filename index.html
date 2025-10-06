@@ -24,24 +24,56 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;     /* Firefox */
 }
+
+
+body.focus-mode :not(#preview-canvas):not(#focus-preview-btn) {
+  background: black !important;
+  border-color: black !important;
+  color: black !important;
+  caret-color: black !important;
+  box-shadow: none !important;
+  outline: none !important;
+  pointer-events: none;
+  user-select: none;
+}
+
  
   </style>
+
+  
 </head>
-<body class="bg-gray-50 min-h-screen p-1 pt-2 overflow-hidden">
-  <div class="w-full mx-auto">
+<body class="bg-black min-h-screen overflow-hidden">
+  <div class="w-full mx-auto pt-1 bg-gray-50">
 
 
           <div class="w-full flex justify-between items-center gap-2 mb-2">
-            <button id="remove-all-btn" class="px-4 py-2 text-sm text-red-600 border hover:bg-red-600 hover:text-white rounded">Remove All</button>
+            <img src="delete-all.png" alt="created by IYAHICON - Flaticon" id="remove-all-btn" class="w-7 h-7 ml-2 hover:scale-105" title="Delete All Frames" />
 
+            <div class="flex items-center gap-2">
+              <div class="w-8">
+                <img
+                src="play.png"
+                alt="created by Lizel Arina - Flaticon"
+                id="play-btn"
+                class="w-6 h-6 cursor-pointer"
+              />
 
-            <div class="flex items-center gap-2 ml-[155px]">
-              <button id="play-btn" class="px-3 py-2 text-green-600 border hover:bg-green-700 hover:text-white">Play</button>
-            <button id="stop-btn" class="px-3 py-2 border hover:bg-black hover:text-white rounded">Stop</button>
-            <div class="text-sm text-gray-500">(or use spacebar)</div>
+              <img
+                src="stop.png"
+                alt="created by The Icon Tree - Flaticon"
+                id="stop-btn"
+                class="w-7 h-7 hidden cursor-pointer"
+              />
+              </div>
+
+              <div class="text-sm text-gray-500 -ml-2">(or use spacebar)</div>
             </div>
 
-            <div class="text-sm text-right text-gray-600 mr-1 w-64">Preview FPS: <span id="fps-label">auto</span></div>
+            <div class="mr-4 flex items-center gap-1">
+              <label class="text-xs text-gray-500">Background</label>
+              <input id="bg-color" type="color" value="#000000" class="mt-0 rounded-md" />
+            </div>
+
           </div>
           
     <div class="grid grid-cols-12 gap-2">
@@ -73,23 +105,29 @@
       </div>
 
       <!-- Right: preview -->
-      <div class="col-span-7 h-fit">
-        <div class="bg-white rounded p-3 border border-gray-100 h-full flex flex-col">
-          <div class="flex items-start justify-between mb-3">
-            <div class="flex gap-1 items-center mt-1.5">
-              <h2 class="font-medium">Preview</h2>
-              <div class="text-sm mt-0.5 text-gray-500">(Loops infinitely)</div>
+      <div class="col-span-7">
+        <div class="rounded p-3 border border-gray-100 h-[100vh] flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <button id="focus-preview-btn" class="px-3 py-2 text-gray-700 hover:bg-black hover:text-white rounded border">Focus Preview</button>
+
+
+            <div class="flex">
+              <div class="flex gap-1 items-center">
+              <button id="toggleOrientationBtn" class="px-3 py-2 text-purple-600 border hover:bg-purple-100 hover:text-black w-[200px]">Switch to Landscape</button>
             </div>
-            <div class="flex gap-2 items-center">
-              <label class="text-xs text-gray-500">Background color</label>
-              <input id="bg-color" type="color" value="#000000" class="mt-0" />
+
+            
+            <div id="collapseBtn" class="hidden gap-2 items-center">
+              <!-- js adds button -->
             </div>
+            </div>
+            <!--  -->
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="col-span-2 border rounded p-2 flex items-center justify-center bg-gray-50 mt-1">
+            <div id="preview-container" class="col-span-2 border rounded p-2 flex items-center justify-center bg-gray-50 mt-0">
               <!-- display current frame or canvas -->
-              <canvas id="preview-canvas" class="max-w-full max-h-[84vh]" width="480" height="320"></canvas>
+              <canvas id="preview-canvas" class="w-full max-h-[84vh]"></canvas>
             </div>
 
 
@@ -97,7 +135,7 @@
 
 
 
-<div class="col-span-1 border rounded p-3 bg-gray-50 flex flex-col justify-between">
+<div id="info" class="col-span-1 border rounded p-3 bg-gray-50 flex flex-col justify-between">
   <!-- Top content -->
   <div>
     <!-- Dropzone -->
