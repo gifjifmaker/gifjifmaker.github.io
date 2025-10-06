@@ -8,3 +8,6 @@
 ![ALT:preview](preview4.png)
 
 
+# ISSUES
+- switching orientation loses current frame focus, so preview appears blank
+
