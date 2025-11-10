@@ -29,6 +29,13 @@ const previewContainer = document.getElementById('preview-container');
 const collapseBtn = document.getElementById('collapseBtn');
 
 
+const width = window.innerWidth;
+const height = 1200;
+
+let isPortrait = true;
+let isCollapsed = false;
+
+
 // frames: { id, file, name, duration(ms), imgBitmap }
 let frames = [];
 let playing = false;
@@ -394,8 +401,6 @@ document.addEventListener('keydown', e => {
 
 
 
-let isPortrait = true;
-let isCollapsed = false;
 
 function updateCollapseButton() {
   // Update collapseBtn content depending on state
@@ -430,8 +435,8 @@ toggleBtn.addEventListener('click', () => {
 
   if (isPortrait) {
     // Switch to landscape
-    previewCanvas.width = 1100;
-    previewCanvas.height = 600;
+    previewCanvas.width = width;
+    previewCanvas.height = height;
     toggleBtn.textContent = 'Switch to Portrait';
 
     collapseBtn.classList.remove('hidden');
@@ -439,8 +444,8 @@ toggleBtn.addEventListener('click', () => {
     updateCollapseButton();
   } else {
     // Switch to portrait
-    previewCanvas.width = 600;
-    previewCanvas.height = 1100;
+    previewCanvas.width = height;
+    previewCanvas.height = width;
     toggleBtn.textContent = 'Switch to Landscape';
 
     // Ensure info panel is visible again when returning to portrait
@@ -462,14 +467,15 @@ toggleBtn.addEventListener('click', () => {
 // Delegate click event for collapse/expand button
 collapseBtn.addEventListener('click', toggleInfo);
 
-
-
 // --- Initialize ---
 function initCanvas() {
-  previewCanvas.width = 600;
-  previewCanvas.height = 1100;
+  // Start in portrait orientation
+  previewCanvas.width = height;
+  previewCanvas.height = width;
+  isPortrait = true;
   clearCanvas();
 }
+
 initCanvas();
 
 
