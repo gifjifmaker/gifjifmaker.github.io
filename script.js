@@ -29,8 +29,8 @@ const previewContainer = document.getElementById('preview-container');
 const collapseBtn = document.getElementById('collapseBtn');
 
 
-const width = window.innerWidth;
-const height = 1200;
+const width = 1280;
+const height = 720;
 
 let isPortrait = true;
 let isCollapsed = false;
