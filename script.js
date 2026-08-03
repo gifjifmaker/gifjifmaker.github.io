@@ -439,8 +439,8 @@ toggleBtn.addEventListener('click', () => {
     updateCollapseButton();
   } else {
     // Switch to portrait
-    previewCanvas.width = 600;
-    previewCanvas.height = 1100;
+    previewCanvas.width = 540;
+    previewCanvas.height = 960;
     toggleBtn.textContent = 'Switch to Landscape';
 
     // Ensure info panel is visible again when returning to portrait
@@ -466,8 +466,8 @@ collapseBtn.addEventListener('click', toggleInfo);
 
 // --- Initialize ---
 function initCanvas() {
-  previewCanvas.width = 600;
-  previewCanvas.height = 1100;
+  previewCanvas.width = 540;
+  previewCanvas.height = 960;
   clearCanvas();
 }
 initCanvas();
